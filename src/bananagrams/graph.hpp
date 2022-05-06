@@ -18,14 +18,14 @@ namespace bananas {
 std::unique_ptr<Node> initializeGraph(const std::string& path_to_words_file);
 
 struct GraphPrintOptions {
-  enum Style { kTree, kList };
+    enum Style { kTree, kList };
 
-  // global options
-  Style style = Style::kTree;
-  std::ostream& stream = std::cout;
+    // global options
+    Style style = Style::kTree;
+    std::ostream& stream = std::cout;
 
-  // kTree options
-  int depth = -1;
+    // kTree options
+    int depth = -1;
 };
 
 /**

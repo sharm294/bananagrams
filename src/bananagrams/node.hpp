@@ -12,13 +12,13 @@ class Node;
 using NodeMap = std::unordered_map<char, std::unique_ptr<Node>>;
 
 class Node {
-  public:
+   public:
     explicit Node(const std::string&);
     Node* next(char);
     Node* add(char);
 
     std::string getWord() const;
-    
+
     void setValid();
     bool isValid() const;
 
@@ -29,10 +29,10 @@ class Node {
     NodeMap::const_iterator cbegin() const;
     NodeMap::const_iterator cend() const;
 
-  private:
+   private:
     std::string word_ = "";
     bool valid_ = false;
     NodeMap next_;
 };
 
-} // namespace bananas
+}  // namespace bananas
