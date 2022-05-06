@@ -1,5 +1,5 @@
 include(CTest)
 
-add_executable(database_test database.cpp)
-target_link_libraries(database_test PRIVATE $<TARGET_OBJECTS:database>)
-target_include_directories(database_test PRIVATE ${PROJECT_SOURCE_DIR}/src)
+add_executable(graph_test graph.cpp)
+target_link_libraries(graph_test PRIVATE bananagrams)
+target_include_directories(graph_test PRIVATE ${PROJECT_SOURCE_DIR}/src)
