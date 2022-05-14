@@ -1,20 +1,25 @@
 #include "graph.hpp"
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <limits>
 #include <memory>
 #include <string>
+#include <unordered_map>
+#include <vector>
+
+#include "charmap.hpp"
 
 namespace bananas {
 
-std::unique_ptr<Node> initializeGraph(const std::string& path_to_words_file) {
-    auto root = std::make_unique<Node>("");
+Graph::Graph(const std::string& path_to_words_file) {
+    graph_ = std::make_unique<Node>("");
 
     std::ifstream word_file(path_to_words_file);
     std::string word;
     while (word_file >> word) {
-        auto* current_node = root.get();
+        auto* current_node = graph_.get();
         for (const auto& c : word) {
             Node* next = current_node->next(c);
             if (next == nullptr) {
@@ -24,8 +29,6 @@ std::unique_ptr<Node> initializeGraph(const std::string& path_to_words_file) {
         }
         current_node->setValid();
     }
-
-    return root;
 }
 
 void printAsTree(Node* root, const std::string& indent, const size_t max_depth,
@@ -57,7 +60,7 @@ void printAsList(Node* root, std::ostream& stream) {
     }
 }
 
-void printGraph(Node* root, const GraphPrintOptions& options) {
+void Graph::print(const GraphPrintOptions& options) {
     using Style = GraphPrintOptions::Style;
 
     auto& stream = options.stream;
@@ -66,14 +69,48 @@ void printGraph(Node* root, const GraphPrintOptions& options) {
             const auto max_depth = options.depth < 1
                                      ? std::numeric_limits<size_t>::max()
                                      : options.depth;
-            printAsTree(root, "", max_depth, stream);
+            printAsTree(graph_.get(), "", max_depth, stream);
             break;
         }
         case Style::kList: {
-            printAsList(root, stream);
+            printAsList(graph_.get(), stream);
             break;
         }
     }
+}
+
+void search(Node* root, CharMap* map, std::vector<std::string>* found_words) {
+    if (root->isValid()) {
+        found_words->emplace_back(root->getWord());
+    }
+    for (const auto& [c, next] : *root) {
+        if (map->has(c) && map->at(c) > 0) {
+            map->at(c)--;
+            search(next.get(), map, found_words);
+            map->at(c)++;
+        }
+    }
+}
+
+std::vector<std::string> Graph::findWords(CharMap characters) {
+    std::vector<std::string> found_words;
+    search(graph_.get(), &characters, &found_words);
+    std::sort(found_words.begin(), found_words.end(),
+              [](const std::string& a, const std::string& b) {
+                  return a.length() > b.length();
+              });
+    return found_words;
+}
+
+bool Graph::isWord(const std::string& word) {
+    auto* curr_node = graph_.get();
+    for (const auto& c : word) {
+        curr_node = curr_node->next(c);
+        if (curr_node == nullptr) {
+            return false;
+        }
+    }
+    return curr_node->isValid();
 }
 
 }  // namespace bananas

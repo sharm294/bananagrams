@@ -1,5 +1,7 @@
 #include "node.hpp"
 
+#include <memory>
+
 namespace bananas {
 
 Node::Node(const std::string& word_so_far) : word_(word_so_far) {}
@@ -22,7 +24,8 @@ void Node::setValid() { valid_ = true; }
 
 bool Node::isValid() const { return valid_; }
 
-std::string Node::getWord() const { return word_; }
+const std::string& Node::getWord() const& { return word_; }
+std::string Node::getWord() const&& { return std::move(word_); }
 
 NodeMap::iterator Node::begin() { return next_.begin(); }
 

@@ -1,4 +1,7 @@
 list(APPEND files
+    # bananagrams
+    board
+    charmap
     graph
     node
 )
@@ -10,8 +13,8 @@ foreach(file ${files})
     list(APPEND object_files $<TARGET_OBJECTS:${file}>)
 endforeach()
 
-add_library(bananagrams INTERFACE)
-target_link_libraries(bananagrams INTERFACE
+add_library(libbananagrams INTERFACE)
+target_link_libraries(libbananagrams INTERFACE
     ${files}
     ${object_files}
 )

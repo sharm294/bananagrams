@@ -17,7 +17,8 @@ class Node {
     Node* next(char);
     Node* add(char);
 
-    std::string getWord() const;
+    const std::string& getWord() const&;
+    std::string getWord() const&&;
 
     void setValid();
     bool isValid() const;
