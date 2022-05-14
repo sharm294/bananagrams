@@ -1,6 +1,6 @@
 #include "board.hpp"
 
-#include "graph.hpp"
+#include "dictionary.hpp"
 #include "node.hpp"
 
 namespace bananas {
@@ -10,7 +10,7 @@ std::ostream &operator<<(std::ostream &os, const Point &self) {
     return os;
 }
 
-Board::Board(Graph *graph) : graph_(graph) {}
+Board::Board(Dictionary *dict) : dict_(dict) {}
 
 char *Board::at(Point p) {
     if (!this->has(p)) {
@@ -119,7 +119,7 @@ std::string Board::getWord(Point p, bool horizontal) {
 
 template <bool horizontal>
 bool tryHorizontal(Board *board, Point connection_point,
-                   const std::string &word, Graph *root) {
+                   const std::string &word, Dictionary *root) {
     // early exit if both adjacent tiles are blocked
     if (hasAdjacentTiles(board, connection_point, horizontal)) {
         return false;
@@ -173,10 +173,10 @@ bool Board::playWord(const std::string &word) {
     // legal positions
     auto board_copy = board_;
     for (const auto &[point, c] : board_copy) {
-        if (tryHorizontal<true>(this, point, word, this->graph_)) {
+        if (tryHorizontal<true>(this, point, word, this->dict_)) {
             return true;
         }
-        if (tryHorizontal<false>(this, point, word, this->graph_)) {
+        if (tryHorizontal<false>(this, point, word, this->dict_)) {
             return true;
         }
     }

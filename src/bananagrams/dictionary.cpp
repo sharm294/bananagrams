@@ -1,4 +1,4 @@
-#include "graph.hpp"
+#include "dictionary.hpp"
 
 #include <algorithm>
 #include <fstream>
@@ -13,13 +13,13 @@
 
 namespace bananas {
 
-Graph::Graph(const std::string& path_to_words_file) {
-    graph_ = std::make_unique<Node>("");
+Dictionary::Dictionary(const std::string& path_to_words_file) {
+    dict_ = std::make_unique<Node>("");
 
     std::ifstream word_file(path_to_words_file);
     std::string word;
     while (word_file >> word) {
-        auto* current_node = graph_.get();
+        auto* current_node = dict_.get();
         for (const auto& c : word) {
             Node* next = current_node->next(c);
             if (next == nullptr) {
@@ -60,8 +60,8 @@ void printAsList(Node* root, std::ostream& stream) {
     }
 }
 
-void Graph::print(const GraphPrintOptions& options) {
-    using Style = GraphPrintOptions::Style;
+void Dictionary::print(const DictionaryPrintOptions& options) {
+    using Style = DictionaryPrintOptions::Style;
 
     auto& stream = options.stream;
     switch (options.style) {
@@ -69,11 +69,11 @@ void Graph::print(const GraphPrintOptions& options) {
             const auto max_depth = options.depth < 1
                                      ? std::numeric_limits<size_t>::max()
                                      : options.depth;
-            printAsTree(graph_.get(), "", max_depth, stream);
+            printAsTree(dict_.get(), "", max_depth, stream);
             break;
         }
         case Style::kList: {
-            printAsList(graph_.get(), stream);
+            printAsList(dict_.get(), stream);
             break;
         }
     }
@@ -92,9 +92,9 @@ void search(Node* root, CharMap* map, std::vector<std::string>* found_words) {
     }
 }
 
-std::vector<std::string> Graph::findWords(CharMap characters) {
+std::vector<std::string> Dictionary::findWords(CharMap characters) {
     std::vector<std::string> found_words;
-    search(graph_.get(), &characters, &found_words);
+    search(dict_.get(), &characters, &found_words);
     std::sort(found_words.begin(), found_words.end(),
               [](const std::string& a, const std::string& b) {
                   return a.length() > b.length();
@@ -102,8 +102,8 @@ std::vector<std::string> Graph::findWords(CharMap characters) {
     return found_words;
 }
 
-bool Graph::isWord(const std::string& word) {
-    auto* curr_node = graph_.get();
+bool Dictionary::isWord(const std::string& word) {
+    auto* curr_node = dict_.get();
     for (const auto& c : word) {
         curr_node = curr_node->next(c);
         if (curr_node == nullptr) {

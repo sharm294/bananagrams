@@ -1,8 +1,7 @@
-#include "bananagrams/graph.hpp"
-
 #include <iostream>
 
 #include "bananagrams/charmap.hpp"
+#include "bananagrams/dictionary.hpp"
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
@@ -14,18 +13,18 @@ namespace bananas {
 SCENARIO("Finding all anagrams") {
     GIVEN("A list of words") {
         auto path = resolvePath("tests/test_words.txt");
-        Graph graph(path);
+        Dictionary dict(path);
 
         WHEN("Search string is 'abder'") {
             CharMap chars("abder");
-            auto words = graph.findWords(chars);
+            auto words = dict.findWords(chars);
             std::vector<std::string> golden = {"bare", "bar"};
             REQUIRE(words == golden);
         }
 
         WHEN("Search string is 'basstec'") {
             CharMap chars("basstec");
-            auto words = graph.findWords(chars);
+            auto words = dict.findWords(chars);
             std::vector<std::string> golden = {"caste", "cast", "bast",
                                                "bass",  "cat",  "bat"};
             REQUIRE(words == golden);
@@ -36,15 +35,15 @@ SCENARIO("Finding all anagrams") {
 SCENARIO("Checking if it's a word") {
     GIVEN("A list of words") {
         auto path = resolvePath("tests/test_words.txt");
-        Graph graph(path);
+        Dictionary dict(path);
 
-        WHEN("Search string is 'bar'") { REQUIRE(graph.isWord("bar") == true); }
+        WHEN("Search string is 'bar'") { REQUIRE(dict.isWord("bar") == true); }
 
         WHEN("Search string is 'bareyl'") {
-            REQUIRE(graph.isWord("bareyl") == false);
+            REQUIRE(dict.isWord("bareyl") == false);
         }
 
-        WHEN("Search string is 'ba'") { REQUIRE(graph.isWord("ba") == false); }
+        WHEN("Search string is 'ba'") { REQUIRE(dict.isWord("ba") == false); }
     }
 }
 

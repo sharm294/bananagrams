@@ -10,7 +10,7 @@ namespace bananas {
 
 class CharMap;
 
-struct GraphPrintOptions {
+struct DictionaryPrintOptions {
     enum Style { kTree, kList };
 
     // global options
@@ -21,17 +21,18 @@ struct GraphPrintOptions {
     int depth = -1;
 };
 
-class Graph {
+class Dictionary {
    public:
-    explicit Graph(const std::string& path_to_words_file);
+    explicit Dictionary(const std::string& path_to_words_file);
 
     bool isWord(const std::string& word);
     std::vector<std::string> findWords(CharMap characters);
 
-    void print(const GraphPrintOptions& options = GraphPrintOptions());
+    void print(
+      const DictionaryPrintOptions& options = DictionaryPrintOptions());
 
    private:
-    std::unique_ptr<Node> graph_;
+    std::unique_ptr<Node> dict_;
 };
 
 }  // namespace bananas

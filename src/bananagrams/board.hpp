@@ -8,7 +8,7 @@
 
 namespace bananas {
 
-class Graph;
+class Dictionary;
 
 struct Point {
     int16_t x;
@@ -72,7 +72,7 @@ enum class Direction { kNorth, kEast, kSouth, kWest };
 
 class Board {
    public:
-    explicit Board(Graph *graph);
+    explicit Board(Dictionary *dict);
 
     bool playWord(const std::string &word);
     bool tryPlace(const std::string &word, Point p, bool horizontal);
@@ -89,7 +89,7 @@ class Board {
     Point getStartingPoint(Point p, bool horizontal);
 
     std::unordered_map<Point, char, PointHash> board_;
-    Graph *graph_;
+    Dictionary *dict_;
     std::stack<std::set<Point>> history_;
 };
 

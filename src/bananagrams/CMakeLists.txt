@@ -2,7 +2,7 @@ list(APPEND files
     # bananagrams
     board
     charmap
-    graph
+    dictionary
     node
 )
 

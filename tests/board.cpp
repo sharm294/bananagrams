@@ -2,14 +2,14 @@
 
 #include <iostream>
 
-#include "bananagrams/graph.hpp"
+#include "bananagrams/dictionary.hpp"
 #include "helpers.hpp"
 
 int main() {
     auto path = bananas::resolvePath("tests/test_words.txt");
-    bananas::Graph graph(path);
+    bananas::Dictionary dict(path);
 
-    bananas::Board board(&graph);
+    bananas::Board board(&dict);
     board.playWord("bard");
     board.playWord("car");
     board.playWord("caste");
