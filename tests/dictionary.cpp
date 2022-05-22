@@ -1,7 +1,8 @@
+#include "bananagrams/dictionary.hpp"
+
 #include <iostream>
 
 #include "bananagrams/charmap.hpp"
-#include "bananagrams/dictionary.hpp"
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
@@ -14,19 +15,23 @@ SCENARIO("Finding all anagrams") {
     GIVEN("A list of words") {
         auto path = resolvePath("tests/test_words.txt");
         Dictionary dict(path);
+        DictionaryFindOptions options;
 
         WHEN("Search string is 'abder'") {
             CharMap chars("abder");
-            auto words = dict.findWords(chars);
-            std::vector<std::string> golden = {"bare", "bar"};
+            auto words = dict.findWords(chars, options);
+            StringSet golden = {
+              "bare",
+              "bard",
+              "bar",
+            };
             REQUIRE(words == golden);
         }
 
         WHEN("Search string is 'basstec'") {
             CharMap chars("basstec");
-            auto words = dict.findWords(chars);
-            std::vector<std::string> golden = {"caste", "cast", "bast",
-                                               "bass",  "cat",  "bat"};
+            auto words = dict.findWords(chars, options);
+            StringSet golden = {"caste", "cast", "bast", "bass", "cat", "bat"};
             REQUIRE(words == golden);
         }
     }
@@ -47,18 +52,30 @@ SCENARIO("Checking if it's a word") {
     }
 }
 
-// TEST_CASE("foo") {
-//     auto path = resolvePath("tests/all_words.txt");
-//     auto root = initializeGraph(path);
-//     auto words = findWords(root.get(), "bardieiasdde");
-//     for (const auto& word : words) {
-//         std::cout << word << "\n";
-//     }
-// }
+SCENARIO("One of pass") {
+    GIVEN("A list of words") {
+        auto path = resolvePath("tests/test_words.txt");
+        Dictionary dict(path);
+
+        WHEN("Search string is 'abder' and must contain 'e'") {
+            CharMap chars("abder");
+            DictionaryFindOptions options;
+            options.one_of.emplace_back("e");
+            auto words = dict.findWords(chars, options);
+            StringSet golden = {"bare"};
+            REQUIRE(words == golden);
+        }
+
+        WHEN("Search string is 'basstec' and must contain 'c' or 's'") {
+            CharMap chars("basstec");
+            DictionaryFindOptions options;
+            options.one_of.emplace_back("c");
+            options.one_of.emplace_back("s");
+            auto words = dict.findWords(chars, options);
+            StringSet golden = {"caste", "cast", "bast", "bass", "cat"};
+            REQUIRE(words == golden);
+        }
+    }
+}
 
 }  // namespace bananas
-
-// int main() {
-//     bananas::printTest1();
-//     return 0;
-// }

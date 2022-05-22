@@ -1,14 +1,14 @@
 #include "board.hpp"
 
+#include <algorithm>
+#include <cassert>
+
+#include "charmap.hpp"
 #include "dictionary.hpp"
 #include "node.hpp"
+#include "point.hpp"
 
 namespace bananas {
-
-std::ostream &operator<<(std::ostream &os, const Point &self) {
-    os << "(" << self.x << "," << self.y << ")";
-    return os;
-}
 
 Board::Board(Dictionary *dict) : dict_(dict) {}
 
@@ -38,22 +38,29 @@ void updatePoint(Point &p, Direction direction) {
     }
 }
 
-bool Board::tryPlace(const std::string &word, Point p, bool horizontal) {
+template <bool horizontal>
+bool Board::tryPlace(const std::string &word, Point p) {
     auto start = p;
+    bool played = false;  // prevent playing the same word over itself
     for (const auto &c : word) {
         if (this->has(p)) {
             auto *placed = this->at(p);
             if (*placed != c) {
                 return false;
             }
+        } else {
+            played = true;  // make sure at least one new character is played
         }
-        if (horizontal) {
+        if constexpr (horizontal) {
             updatePoint(p, Direction::kEast);
         } else {
             updatePoint(p, Direction::kSouth);
         }
     }
-    if (horizontal) {
+    if (!played) {
+        return false;
+    }
+    if constexpr (horizontal) {
         this->insertWord(word, start, Direction::kEast);
     } else {
         this->insertWord(word, start, Direction::kSouth);
@@ -61,17 +68,18 @@ bool Board::tryPlace(const std::string &word, Point p, bool horizontal) {
     return true;
 }
 
-Point Board::getStartingPoint(Point p, bool horizontal) {
+template <bool horizontal>
+Point getStartingPoint(Board *board, Point p) {
     // find start of word containing point p
-    while (has(p)) {
-        if (horizontal) {
+    while (board->has(p)) {
+        if constexpr (horizontal) {
             updatePoint(p, Direction::kWest);
         } else {
             updatePoint(p, Direction::kNorth);
         }
     }
     // undo last update
-    if (horizontal) {
+    if constexpr (horizontal) {
         updatePoint(p, Direction::kEast);
     } else {
         updatePoint(p, Direction::kSouth);
@@ -79,11 +87,12 @@ Point Board::getStartingPoint(Point p, bool horizontal) {
     return p;
 }
 
-bool hasAdjacentTiles(Board *board, Point p, bool horizontal) {
+template <bool horizontal>
+bool hasAdjacentTiles(Board *board, Point p) {
     Point adjacent_0 = p;
     Point adjacent_1 = p;
 
-    if (horizontal) {
+    if constexpr (horizontal) {
         updatePoint(adjacent_0, Direction::kWest);
         updatePoint(adjacent_1, Direction::kEast);
     } else {
@@ -94,21 +103,31 @@ bool hasAdjacentTiles(Board *board, Point p, bool horizontal) {
     return board->has(adjacent_0) && board->has(adjacent_1);
 }
 
-void Board::removeLastWord() {
+std::string Board::removeLastWord() {
     auto &last = history_.top();
+    std::string removed_chars;
     for (const auto &p : last) {
+        removed_chars += board_[p];
         board_.erase(p);
     }
     history_.pop();
+    return removed_chars;
 }
 
-std::string Board::getWord(Point p, bool horizontal) {
-    p = getStartingPoint(p, horizontal);
+/**
+ * @brief Given a point and a direction, get the word containing this point
+ *
+ * @param p a point
+ * @return std::string
+ */
+template <bool horizontal>
+std::string getWord(Board *board, Point p) {
+    p = getStartingPoint<horizontal>(board, p);
 
     std::string s;
-    while (has(p)) {
-        s += *(this->at(p));
-        if (horizontal) {
+    while (board->has(p)) {
+        s += *(board->at(p));
+        if constexpr (horizontal) {
             updatePoint(p, Direction::kEast);
         } else {
             updatePoint(p, Direction::kSouth);
@@ -118,14 +137,14 @@ std::string Board::getWord(Point p, bool horizontal) {
 }
 
 template <bool horizontal>
-bool tryHorizontal(Board *board, Point connection_point,
-                   const std::string &word, Dictionary *root) {
+bool Board::tryHorizontal(Point connection_point, const std::string &word,
+                          size_t offset) {
     // early exit if both adjacent tiles are blocked
-    if (hasAdjacentTiles(board, connection_point, horizontal)) {
+    if (hasAdjacentTiles<horizontal>(this, connection_point)) {
         return false;
     }
 
-    auto *c = board->at(connection_point);
+    auto *c = this->at(connection_point);
     for (auto i = 0U; i < word.length(); ++i) {
         if (*c != word[i]) {
             continue;
@@ -136,7 +155,7 @@ bool tryHorizontal(Board *board, Point connection_point,
         } else {
             starting_point = connection_point - std::make_pair(0, i);
         }
-        if (board->tryPlace(word, starting_point, horizontal)) {
+        if (this->tryPlace<horizontal>(word, starting_point)) {
             for (auto j = 0U; j < word.length(); ++j) {
                 Point curr_point;
                 if constexpr (horizontal) {
@@ -150,41 +169,110 @@ bool tryHorizontal(Board *board, Point connection_point,
                 if (curr_point == connection_point) {
                     continue;
                 }
-                auto str = board->getWord(curr_point, !horizontal);
-                if (str.length() > 1 && !root->isWord(str)) {
-                    board->removeLastWord();
+                auto str = getWord<!horizontal>(this, curr_point);
+                if (str.length() > 1 && !dict_->isWord(str)) {
+                    this->removeLastWord();
                     return false;
                 }
             }
-            return true;
+            // we need to be able to try multiple valid positions that are
+            // possible, not just the first one
+            if (offset == 0) {
+                return true;
+            } else {
+                this->removeLastWord();
+                --offset;
+            }
         }
     }
     return false;
 }
 
-bool Board::playWord(const std::string &word) {
+std::string Board::getLastWord() {
+    auto &last = history_.top();
+    std::string chars;
+    for (const auto &p : last) {
+        chars += board_[p];
+    }
+    return chars;
+}
+
+std::pair<std::string, int> Board::playWord(
+  CharMap characters, const DictionaryFindOptions &options, size_t word_offset,
+  size_t position_offset) {
     // if board is currently empty, play word at origin
-    if (board_.find({0, 0}) == board_.end()) {
-        insertWord(word, {0, 0}, Direction::kEast);
-        return true;
+    if (board_.empty()) {
+        // if we're trying to play the first word somewhere else, early exit
+        if (position_offset > 0) {
+            return std::make_pair("", 0);
+        }
+
+        auto words = dict_->findWords(characters, options);
+        std::sort(words.begin(), words.end(), sortWords);
+        if (word_offset < words.size()) {
+            auto &word = *std::next(words.begin(), word_offset);
+            insertWord(word, {0, 0}, Direction::kEast);
+            return std::make_pair(word, -2);
+        } else {
+            return std::make_pair("", -1);
+        }
     }
 
     // otherwise, there's at least one word in play and we need to search for
     // legal positions
     auto board_copy = board_;
+    StringSet words_tmp;
+    std::vector<std::pair<std::string, Point>> words;
+    // TODO: we need to find the word (horizontal and vertical) at each point
+    // and add that to options so we can find words that include substrings
     for (const auto &[point, c] : board_copy) {
-        if (tryHorizontal<true>(this, point, word, this->dict_)) {
-            return true;
-        }
-        if (tryHorizontal<false>(this, point, word, this->dict_)) {
-            return true;
-        }
+        characters += c;
+        StringSet words_tmp;
+        dict_->findWords(characters, options, &words_tmp);
+        characters -= c;
+        const auto &point_copy = point;
+        std::transform(words_tmp.cbegin(), words_tmp.cend(),
+                       std::back_inserter(words),
+                       [&point_copy](const std::string &word) {
+                           return std::make_pair(word, point_copy);
+                       });
     }
-    return false;
+    std::sort(words.begin(), words.end(),
+              [](const std::pair<std::string, Point> &lhs,
+                 const std::pair<std::string, Point> &rhs) {
+                  const auto &lhs_str = lhs.first;
+                  const auto &rhs_str = rhs.first;
+
+                  return sortWords(lhs_str, rhs_str);
+              });
+
+    if (word_offset >= words.size()) {
+        return std::make_pair("", -1);
+    }
+    auto &word = words[word_offset].first;
+    auto &point = words[word_offset].second;
+
+    if (this->tryHorizontal<true>(point, word, position_offset)) {
+        return std::make_pair(getLastWord(), -2);
+    }
+    if (this->tryHorizontal<false>(point, word, position_offset)) {
+        return std::make_pair(getLastWord(), -2);
+    }
+
+    // for (const auto &[point, c] : board_copy) {
+    //     if (this->tryHorizontal<true>(point, word, position_offset)) {
+    //         return std::make_pair(getLastWord(), -2);
+    //     }
+    //     if (this->tryHorizontal<false>(point, word, position_offset)) {
+    //         return std::make_pair(getLastWord(), -2);
+    //     }
+    // }
+    return std::make_pair("", 0);
 }
 
 void Board::insertWord(const std::string &word, Point start,
                        Direction direction) {
+    assert(!word.empty());
     Point curr_point = start;
     history_.emplace();
     auto &top = history_.top();

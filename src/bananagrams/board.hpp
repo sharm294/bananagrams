@@ -6,67 +6,13 @@
 #include <stack>
 #include <unordered_map>
 
+#include "point.hpp"
+
 namespace bananas {
 
+class CharMap;
 class Dictionary;
-
-struct Point {
-    int16_t x;
-    int16_t y;
-
-    friend std::ostream &operator<<(std::ostream &os, const Point &self);
-    Point &operator+=(const std::pair<int, int> &rhs) {
-        x += rhs.first;
-        y += rhs.second;
-        return *this;
-    }
-
-    Point &operator-=(const std::pair<int, int> &rhs) {
-        x -= rhs.first;
-        y -= rhs.second;
-        return *this;
-    }
-};
-
-struct PointHash {
-    std::size_t operator()(const Point &p) const noexcept {
-        return ((p.x << 16) | p.y);
-    }
-};
-
-inline Point operator+(Point lhs, std::pair<int, int> rhs) {
-    lhs.x += rhs.first;
-    lhs.y += rhs.second;
-    return lhs;
-}
-
-inline Point operator-(Point lhs, std::pair<int, int> rhs) {
-    lhs.x -= rhs.first;
-    lhs.y -= rhs.second;
-    return lhs;
-}
-
-inline bool operator==(const Point &lhs, const Point &rhs) {
-    return lhs.x == rhs.x && lhs.y == rhs.y;
-}
-inline bool operator!=(const Point &lhs, const Point &rhs) {
-    return !operator==(lhs, rhs);
-}
-inline bool operator<(const Point &lhs, const Point &rhs) {
-    if (lhs.x != rhs.x) {
-        return lhs.x < rhs.x;
-    }
-    return lhs.y < rhs.y;
-}
-inline bool operator>(const Point &lhs, const Point &rhs) {
-    return operator<(rhs, lhs);
-}
-inline bool operator<=(const Point &lhs, const Point &rhs) {
-    return !operator>(lhs, rhs);
-}
-inline bool operator>=(const Point &lhs, const Point &rhs) {
-    return !operator<(lhs, rhs);
-}
+class DictionaryFindOptions;
 
 enum class Direction { kNorth, kEast, kSouth, kWest };
 
@@ -74,10 +20,14 @@ class Board {
    public:
     explicit Board(Dictionary *dict);
 
-    bool playWord(const std::string &word);
-    bool tryPlace(const std::string &word, Point p, bool horizontal);
-    std::string getWord(Point p, bool horizontal);
-    void removeLastWord();
+    // return value is word played (empty if nothing) and whether we failed
+    // because: ran out of words (-1), index failed (0), offset failed (>0),
+    // don't care (-2)
+    std::pair<std::string, int> playWord(CharMap characters,
+                                          const DictionaryFindOptions &options,
+                                          size_t word_offset,
+                                          size_t position_offset);
+    std::string removeLastWord();
 
     char *at(Point p);
     bool has(Point p);
@@ -86,7 +36,14 @@ class Board {
 
    private:
     void insertWord(const std::string &word, Point start, Direction direction);
-    Point getStartingPoint(Point p, bool horizontal);
+    std::string getLastWord();
+
+    template <bool horizontal>
+    bool tryPlace(const std::string &word, Point p);
+
+    template <bool horizontal>
+    bool tryHorizontal(Point connection_point, const std::string &word,
+                       size_t offset);
 
     std::unordered_map<Point, char, PointHash> board_;
     Dictionary *dict_;

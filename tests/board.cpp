@@ -10,9 +10,9 @@ int main() {
     bananas::Dictionary dict(path);
 
     bananas::Board board(&dict);
-    board.playWord("bard");
-    board.playWord("car");
-    board.playWord("caste");
-    board.playWord("basil");
+    // board.playWord("bard", 0);
+    // board.playWord("car", 0);
+    // board.playWord("caste", 0);
+    // board.playWord("basil", 0);
     std::cout << board << std::endl;
 }

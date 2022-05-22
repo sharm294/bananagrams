@@ -1,5 +1,5 @@
 list(APPEND files
-    # bananagrams
+    bananagrams
     board
     charmap
     dictionary

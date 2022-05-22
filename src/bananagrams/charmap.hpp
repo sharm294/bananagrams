@@ -9,17 +9,34 @@ class CharMap {
    public:
     explicit CharMap(const std::string& characters);
 
-    bool has(char c);
+    bool has(char c) const;
+    bool empty() const;
 
     int& at(char c) &;
     int at(char c) const&&;
 
+    CharMap& operator+=(const char& rhs) {
+        if (map_.find(rhs) != map_.end()) {
+            map_.at(rhs) += 1;
+        } else {
+            map_.insert({rhs, 1});
+        }
+        return *this;
+    }
+
     CharMap& operator+=(const std::string& rhs) {
         for (const auto& c : rhs) {
-            if (map_.find(c) != map_.end()) {
-                ++map_.at(c);
+            *this += c;
+        }
+        return *this;
+    }
+
+    CharMap& operator-=(const char& rhs) {
+        if (map_.find(rhs) != map_.end()) {
+            if (map_.at(rhs) > 1) {
+                --map_.at(rhs);
             } else {
-                map_.insert({c, 1});
+                map_.erase(rhs);
             }
         }
         return *this;
@@ -27,13 +44,7 @@ class CharMap {
 
     CharMap& operator-=(const std::string& rhs) {
         for (const auto& c : rhs) {
-            if (map_.find(c) != map_.end()) {
-                if (map_.at(c) > 0) {
-                    --map_.at(c);
-                } else {
-                    map_.erase(c);
-                }
-            }
+            *this -= c;
         }
         return *this;
     }
@@ -42,12 +53,14 @@ class CharMap {
     std::unordered_map<char, int> map_;
 };
 
-inline CharMap operator+(CharMap lhs, const std::string& rhs) {
+template <typename T>
+inline CharMap operator+(CharMap lhs, const T& rhs) {
     lhs += rhs;
     return lhs;
 }
 
-inline CharMap operator-(CharMap lhs, const std::string& rhs) {
+template <typename T>
+inline CharMap operator-(CharMap lhs, const T& rhs) {
     lhs -= rhs;
     return lhs;
 }
