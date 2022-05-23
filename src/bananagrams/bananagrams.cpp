@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cassert>
 #include <iostream>
 #include <stack>
 #include <string>
@@ -10,58 +11,47 @@
 
 namespace bananas {
 
-Board play(const std::string& dictionary_path, const std::string& characters) {
+Board play(const std::string& dictionary_path,
+           const DictionaryFindOptions& options,
+           const std::string& characters) {
     CharMap chars(characters);
     Dictionary dict(dictionary_path);
-    DictionaryFindOptions options;
 
-    // auto words = dict.findWords(chars, options);
     Board board(&dict);
 
-    std::stack<std::pair<size_t, size_t>> indices;
-    indices.push({0, 0});
+    // maintain the state (word_index and position_index of each played) so
+    // we can keep track on backtracking
+    std::stack<std::pair<size_t, size_t>> state;
+    state.push({0, 0});
     do {
-        auto& [index, offset] = indices.top();
-        // if we exhausted all the words we had, we need to backtrack
-        // if (index >= words.size()) {
-        //     if (indices.size() == 1) {
-        //         std::cout << "Could not find solution" << std::endl;
-        //         return board;
-        //     }
-        //     auto removed_chars = board.removeLastWord();
-        //     chars += removed_chars;
-        //     words = dict.findWords(chars, options);
-        //     indices.pop();
-        //     indices.top().second++;
-        //     continue;
-        // }
-        auto [played_chars, failure] =
-          board.playWord(chars, options, index, offset);
-        if (!played_chars.empty()) {
-            std::cout << board << std::endl;
-            chars -= played_chars;
-            indices.push({0, 0});
-        } else if (failure == -1) {
-            if (indices.size() == 1) {
-                std::cout << "Could not find solution" << std::endl;
-                return board;
-            }
-            auto removed_chars = board.removeLastWord();
-            chars += removed_chars;
-            indices.pop();
-            indices.top().second++;  // increment offset
-        } else if (failure == 0) {
-            index++;
-            offset = 0;
-        } else {
+        auto& [word_offset, position_offset] = state.top();
+        auto [played_chars, retval] =
+          board.playWord(chars, options, word_offset, position_offset);
+        switch (retval) {
+            case PlayWordState::kSuccess:
+                assert(!played_chars.empty());
+                // std::cout << board << std::endl;
+                chars -= played_chars;
+                state.push({0, 0});
+                break;
+            case PlayWordState::kWordIndexError:
+                // if the first word played is giving us this error, we have
+                // no valid solution given the characters and constraints
+                if (state.size() == 1) {
+                    std::cout << "Could not find solution" << std::endl;
+                    return board;
+                }
+                chars += board.removeLastWord();
+                state.pop();
+                state.top().second++;  // increment position offset
+                break;
+            case PlayWordState::kWordPositionError:
+                word_offset++;
+                position_offset = 0;
+                break;
+            default:
+                assert(false);
         }
-
-        // else if (offset > 0) {
-        //     index++;
-        //     offset = 0;
-        // } else {
-        //     offset++;
-        // }
     } while (!chars.empty());
     return board;
 }

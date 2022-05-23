@@ -197,37 +197,36 @@ std::string Board::getLastWord() {
     return chars;
 }
 
-std::pair<std::string, int> Board::playWord(
-  CharMap characters, const DictionaryFindOptions &options, size_t word_offset,
-  size_t position_offset) {
+PlayWordResult Board::playWord(CharMap characters,
+                               const DictionaryFindOptions &options,
+                               size_t word_offset, size_t position_offset) {
     // if board is currently empty, play word at origin
     if (board_.empty()) {
         // if we're trying to play the first word somewhere else, early exit
         if (position_offset > 0) {
-            return std::make_pair("", 0);
+            return std::make_pair("", PlayWordState::kWordPositionError);
         }
 
         auto words = dict_->findWords(characters, options);
         std::sort(words.begin(), words.end(), sortWords);
         if (word_offset < words.size()) {
-            auto &word = *std::next(words.begin(), word_offset);
+            auto &word = words[word_offset];
             insertWord(word, {0, 0}, Direction::kEast);
-            return std::make_pair(word, -2);
+            return std::make_pair(word, PlayWordState::kSuccess);
         } else {
-            return std::make_pair("", -1);
+            return std::make_pair("", PlayWordState::kWordIndexError);
         }
     }
 
     // otherwise, there's at least one word in play and we need to search for
     // legal positions
-    auto board_copy = board_;
-    StringSet words_tmp;
+    StringVector words_tmp;
     std::vector<std::pair<std::string, Point>> words;
     // TODO: we need to find the word (horizontal and vertical) at each point
     // and add that to options so we can find words that include substrings
-    for (const auto &[point, c] : board_copy) {
+    for (const auto &[point, c] : board_) {
         characters += c;
-        StringSet words_tmp;
+        StringVector words_tmp;
         dict_->findWords(characters, options, &words_tmp);
         characters -= c;
         const auto &point_copy = point;
@@ -247,27 +246,21 @@ std::pair<std::string, int> Board::playWord(
               });
 
     if (word_offset >= words.size()) {
-        return std::make_pair("", -1);
+        return std::make_pair("", PlayWordState::kWordIndexError);
     }
     auto &word = words[word_offset].first;
     auto &point = words[word_offset].second;
 
+    // try to play it horizontally
     if (this->tryHorizontal<true>(point, word, position_offset)) {
-        return std::make_pair(getLastWord(), -2);
+        return std::make_pair(getLastWord(), PlayWordState::kSuccess);
     }
+    // try to play it vertically
     if (this->tryHorizontal<false>(point, word, position_offset)) {
-        return std::make_pair(getLastWord(), -2);
+        return std::make_pair(getLastWord(), PlayWordState::kSuccess);
     }
 
-    // for (const auto &[point, c] : board_copy) {
-    //     if (this->tryHorizontal<true>(point, word, position_offset)) {
-    //         return std::make_pair(getLastWord(), -2);
-    //     }
-    //     if (this->tryHorizontal<false>(point, word, position_offset)) {
-    //         return std::make_pair(getLastWord(), -2);
-    //     }
-    // }
-    return std::make_pair("", 0);
+    return std::make_pair("", PlayWordState::kWordPositionError);
 }
 
 void Board::insertWord(const std::string &word, Point start,

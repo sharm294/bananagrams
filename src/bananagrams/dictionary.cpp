@@ -110,7 +110,7 @@ bool checkValid(const std::string& word, const DictionaryFindOptions& options) {
 }
 
 void search(Node* root, CharMap* map, const DictionaryFindOptions& options,
-            StringSet* found_words) {
+            StringVector* found_words) {
     if (root->isValid()) {
         auto& word = root->getWord();
         if (checkValid(word, options)) {
@@ -126,11 +126,6 @@ void search(Node* root, CharMap* map, const DictionaryFindOptions& options,
     }
 }
 
-std::vector<std::string> toVector(const StringSet& set) {
-    std::vector<std::string> output(set.begin(), set.end());
-    return output;
-}
-
 bool sortWords(const std::string& lhs, const std::string& rhs) {
     if (lhs.length() != rhs.length()) {
         return lhs.length() > rhs.length();
@@ -138,16 +133,16 @@ bool sortWords(const std::string& lhs, const std::string& rhs) {
     return lhs > rhs;
 }
 
-StringSet Dictionary::findWords(CharMap characters,
-                                const DictionaryFindOptions& options) {
-    StringSet found_words;
+StringVector Dictionary::findWords(CharMap characters,
+                                   const DictionaryFindOptions& options) {
+    StringVector found_words;
     search(dict_.get(), &characters, options, &found_words);
     return found_words;
 }
 
 void Dictionary::findWords(CharMap characters,
                            const DictionaryFindOptions& options,
-                           StringSet* set) {
+                           StringVector* set) {
     search(dict_.get(), &characters, options, set);
 }
 

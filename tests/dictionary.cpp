@@ -20,7 +20,7 @@ SCENARIO("Finding all anagrams") {
         WHEN("Search string is 'abder'") {
             CharMap chars("abder");
             auto words = dict.findWords(chars, options);
-            StringSet golden = {
+            StringVector golden = {
               "bare",
               "bard",
               "bar",
@@ -31,7 +31,8 @@ SCENARIO("Finding all anagrams") {
         WHEN("Search string is 'basstec'") {
             CharMap chars("basstec");
             auto words = dict.findWords(chars, options);
-            StringSet golden = {"caste", "cast", "bast", "bass", "cat", "bat"};
+            StringVector golden = {"caste", "cast", "bast",
+                                   "bass",  "cat",  "bat"};
             REQUIRE(words == golden);
         }
     }
@@ -62,7 +63,7 @@ SCENARIO("One of pass") {
             DictionaryFindOptions options;
             options.one_of.emplace_back("e");
             auto words = dict.findWords(chars, options);
-            StringSet golden = {"bare"};
+            StringVector golden = {"bare"};
             REQUIRE(words == golden);
         }
 
@@ -72,7 +73,7 @@ SCENARIO("One of pass") {
             options.one_of.emplace_back("c");
             options.one_of.emplace_back("s");
             auto words = dict.findWords(chars, options);
-            StringSet golden = {"caste", "cast", "bast", "bass", "cat"};
+            StringVector golden = {"caste", "cast", "bast", "bass", "cat"};
             REQUIRE(words == golden);
         }
     }

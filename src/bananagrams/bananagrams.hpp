@@ -5,7 +5,9 @@
 namespace bananas {
 
 class Board;
+class DictionaryFindOptions;
 
-Board play(const std::string& dictionary_path, const std::string& characters);
+Board play(const std::string& dictionary_path,
+           const DictionaryFindOptions& options, const std::string& characters);
 
 }  // namespace bananas

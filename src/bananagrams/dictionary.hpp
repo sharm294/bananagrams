@@ -18,9 +18,7 @@ struct WordSort {
         return sortWords(lhs, rhs);
     }
 };
-using StringSet = std::vector<std::string>;
-
-std::vector<std::string> toVector(const StringSet& set);
+using StringVector = std::vector<std::string>;
 
 struct DictionaryPrintOptions {
     enum Style { kTree, kList };
@@ -42,10 +40,10 @@ class Dictionary {
     explicit Dictionary(const std::string& path_to_words_file);
 
     bool isWord(const std::string& word);
-    StringSet findWords(CharMap characters,
-                        const DictionaryFindOptions& options);
+    StringVector findWords(CharMap characters,
+                           const DictionaryFindOptions& options);
     void findWords(CharMap characters, const DictionaryFindOptions& options,
-                   StringSet* set);
+                   StringVector* set);
 
     void print(
       const DictionaryPrintOptions& options = DictionaryPrintOptions());
