@@ -11,11 +11,9 @@
 
 namespace bananas {
 
-Board play(const std::string& dictionary_path,
-           const DictionaryFindOptions& options,
+Board play(const Dictionary& dict, const DictionaryFindOptions& options,
            const std::string& characters) {
     CharMap chars(characters);
-    Dictionary dict(dictionary_path);
 
     Board board(&dict);
 

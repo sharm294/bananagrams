@@ -8,12 +8,15 @@
 #include "helpers.hpp"
 
 int main() {
-    auto path = bananas::resolvePath("tests/test_words.txt");
+    bananas::DictionaryFindOptions options;
+    options.frequency_range = {99, 100};
+    options.dictionary_file = bananas::resolvePath("dictionaries/en_1.txt");
+    bananas::Dictionary dict{options};
 
-    std::string chars = "bardcaasteasil";
+    std::string chars = "aksdhfoweroweounsdkfnaweyuruewliuoiiioi";
     std::transform(chars.begin(), chars.end(), chars.begin(),
                    [](unsigned char c) { return std::tolower(c); });
-    bananas::DictionaryFindOptions options;
-    auto board = bananas::play(path, options, chars);
+
+    auto board = bananas::play(dict, options, chars);
     std::cout << board << std::endl;
 }

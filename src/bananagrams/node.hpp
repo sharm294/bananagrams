@@ -23,6 +23,9 @@ class Node {
     void setValid();
     bool isValid() const;
 
+    void setFrequency(float frequency);
+    float getFrequency() const;
+
     void print(const std::string&, std::ostream&);
 
     NodeMap::iterator begin();
@@ -33,6 +36,7 @@ class Node {
    private:
     std::string word_ = "";
     bool valid_ = false;
+    float frequency_ = 0;
     NodeMap next_;
 };
 

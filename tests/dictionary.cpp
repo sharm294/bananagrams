@@ -13,9 +13,9 @@ namespace bananas {
 
 SCENARIO("Finding all anagrams") {
     GIVEN("A list of words") {
-        auto path = resolvePath("tests/test_words.txt");
-        Dictionary dict(path);
-        DictionaryFindOptions options;
+        bananas::DictionaryFindOptions options;
+        options.dictionary_file = bananas::resolvePath("tests/test_words.txt");
+        Dictionary dict(options);
 
         WHEN("Search string is 'abder'") {
             CharMap chars("abder");
@@ -40,8 +40,9 @@ SCENARIO("Finding all anagrams") {
 
 SCENARIO("Checking if it's a word") {
     GIVEN("A list of words") {
-        auto path = resolvePath("tests/test_words.txt");
-        Dictionary dict(path);
+        bananas::DictionaryFindOptions options;
+        options.dictionary_file = bananas::resolvePath("tests/test_words.txt");
+        Dictionary dict(options);
 
         WHEN("Search string is 'bar'") { REQUIRE(dict.isWord("bar") == true); }
 
@@ -55,8 +56,9 @@ SCENARIO("Checking if it's a word") {
 
 SCENARIO("One of pass") {
     GIVEN("A list of words") {
-        auto path = resolvePath("tests/test_words.txt");
-        Dictionary dict(path);
+        bananas::DictionaryFindOptions options;
+        options.dictionary_file = bananas::resolvePath("tests/test_words.txt");
+        Dictionary dict(options);
 
         WHEN("Search string is 'abder' and must contain 'e'") {
             CharMap chars("abder");

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <set>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "node.hpp"
@@ -32,23 +33,28 @@ struct DictionaryPrintOptions {
 };
 
 struct DictionaryFindOptions {
+    // global options
+    std::string dictionary_file;
+
     std::vector<std::string> one_of;
+    std::pair<float, float> frequency_range = {0, 0};
 };
 
 class Dictionary {
    public:
-    explicit Dictionary(const std::string& path_to_words_file);
+    explicit Dictionary(DictionaryFindOptions options);
 
-    bool isWord(const std::string& word);
+    bool isWord(const std::string& word) const;
     StringVector findWords(CharMap characters,
-                           const DictionaryFindOptions& options);
+                           const DictionaryFindOptions& options) const;
     void findWords(CharMap characters, const DictionaryFindOptions& options,
-                   StringVector* set);
+                   StringVector* set) const;
 
     void print(
-      const DictionaryPrintOptions& options = DictionaryPrintOptions());
+      const DictionaryPrintOptions& options = DictionaryPrintOptions()) const;
 
    private:
+    DictionaryFindOptions options_;
     std::unique_ptr<Node> dict_;
 };
 

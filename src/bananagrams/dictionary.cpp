@@ -13,12 +13,14 @@
 
 namespace bananas {
 
-Dictionary::Dictionary(const std::string& path_to_words_file) {
+Dictionary::Dictionary(DictionaryFindOptions options)
+  : options_(std::move(options)) {
     dict_ = std::make_unique<Node>("");
 
-    std::ifstream word_file(path_to_words_file);
+    std::ifstream word_file(options_.dictionary_file);
     std::string word;
-    while (word_file >> word) {
+    float frequency;
+    while (word_file >> word >> frequency) {
         auto* current_node = dict_.get();
         for (const auto& c : word) {
             Node* next = current_node->next(c);
@@ -28,6 +30,7 @@ Dictionary::Dictionary(const std::string& path_to_words_file) {
             current_node = next;
         }
         current_node->setValid();
+        current_node->setFrequency(frequency);
     }
 }
 
@@ -60,7 +63,7 @@ void printAsList(Node* root, std::ostream& stream) {
     }
 }
 
-void Dictionary::print(const DictionaryPrintOptions& options) {
+void Dictionary::print(const DictionaryPrintOptions& options) const {
     using Style = DictionaryPrintOptions::Style;
 
     auto& stream = options.stream;
@@ -86,14 +89,14 @@ void Dictionary::print(const DictionaryPrintOptions& options) {
  * @param one_of vector of strings to check
  * @return true if found at least one
  */
-bool oneOfPass(const std::string& word,
-               const std::vector<std::string>& one_of) {
+bool oneOfPass(Node* node, const std::vector<std::string>& one_of) {
     // if we have no conditions, we always pass
     if (one_of.empty()) {
         return true;
     }
 
     // otherwise, we check if we have at least one match
+    const auto& word = node->getWord();
     for (const auto& str : one_of) {
         if (word.find(str) != word.npos) {
             return true;
@@ -102,19 +105,29 @@ bool oneOfPass(const std::string& word,
     return false;
 }
 
-bool checkValid(const std::string& word, const DictionaryFindOptions& options) {
-    if (!oneOfPass(word, options.one_of)) {
+bool frequencyPass(Node* node, std::pair<float, float> frequency_range) {
+    auto frequency = node->getFrequency();
+    return frequency >= frequency_range.first &&
+           frequency <= frequency_range.second;
+}
+
+bool checkValid(Node* node, const DictionaryFindOptions& options) {
+    if (!oneOfPass(node, options.one_of)) {
         return false;
     }
+
+    if (!frequencyPass(node, options.frequency_range)) {
+        return false;
+    }
+
     return true;
 }
 
 void search(Node* root, CharMap* map, const DictionaryFindOptions& options,
             StringVector* found_words) {
     if (root->isValid()) {
-        auto& word = root->getWord();
-        if (checkValid(word, options)) {
-            found_words->emplace_back(word);
+        if (checkValid(root, options)) {
+            found_words->emplace_back(root->getWord());
         }
     }
     for (const auto& [c, next] : *root) {
@@ -134,7 +147,7 @@ bool sortWords(const std::string& lhs, const std::string& rhs) {
 }
 
 StringVector Dictionary::findWords(CharMap characters,
-                                   const DictionaryFindOptions& options) {
+                                   const DictionaryFindOptions& options) const {
     StringVector found_words;
     search(dict_.get(), &characters, options, &found_words);
     return found_words;
@@ -142,11 +155,11 @@ StringVector Dictionary::findWords(CharMap characters,
 
 void Dictionary::findWords(CharMap characters,
                            const DictionaryFindOptions& options,
-                           StringVector* set) {
-    search(dict_.get(), &characters, options, set);
+                           StringVector* vector) const {
+    search(dict_.get(), &characters, options, vector);
 }
 
-bool Dictionary::isWord(const std::string& word) {
+bool Dictionary::isWord(const std::string& word) const {
     auto* curr_node = dict_.get();
     for (const auto& c : word) {
         curr_node = curr_node->next(c);
@@ -154,7 +167,10 @@ bool Dictionary::isWord(const std::string& word) {
             return false;
         }
     }
-    return curr_node->isValid();
+    if (!curr_node->isValid()) {
+        return false;
+    }
+    return checkValid(curr_node, this->options_);
 }
 
 }  // namespace bananas

@@ -10,7 +10,7 @@
 
 namespace bananas {
 
-Board::Board(Dictionary *dict) : dict_(dict) {}
+Board::Board(const Dictionary *dict) : dict_(dict) {}
 
 char *Board::at(Point p) {
     if (!this->has(p)) {
@@ -156,6 +156,15 @@ bool Board::tryHorizontal(Point connection_point, const std::string &word,
             starting_point = connection_point - std::make_pair(0, i);
         }
         if (this->tryPlace<horizontal>(word, starting_point)) {
+            // if successful, check the word in the same direction
+            auto read_word = getWord<horizontal>(this, starting_point);
+            if (!dict_->isWord(read_word)) {
+                this->removeLastWord();
+                return false;
+            }
+
+            // if the same direction succeeds, also check all words made
+            // perpendicular to the new one
             for (auto j = 0U; j < word.length(); ++j) {
                 Point curr_point;
                 if constexpr (horizontal) {

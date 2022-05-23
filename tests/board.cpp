@@ -6,8 +6,9 @@
 #include "helpers.hpp"
 
 int main() {
-    auto path = bananas::resolvePath("tests/test_words.txt");
-    bananas::Dictionary dict(path);
+    bananas::DictionaryFindOptions options;
+    options.dictionary_file = bananas::resolvePath("tests/test_words.txt");
+    bananas::Dictionary dict(options);
 
     bananas::Board board(&dict);
     // board.playWord("bard", 0);

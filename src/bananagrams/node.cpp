@@ -24,6 +24,10 @@ void Node::setValid() { valid_ = true; }
 
 bool Node::isValid() const { return valid_; }
 
+void Node::setFrequency(float frequency) { frequency_ = frequency; }
+
+float Node::getFrequency() const { return frequency_; }
+
 const std::string& Node::getWord() const& { return word_; }
 std::string Node::getWord() const&& { return std::move(word_); }
 
