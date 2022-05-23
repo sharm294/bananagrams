@@ -16,7 +16,7 @@ def parser_0(path_to_file, data: dict):
     with open(path_to_file) as f:
         for line in f:
             read_line = line.split()
-            word = read_line[0].strip()
+            word = read_line[0].strip().lower()
             if word not in data:
                 data[word] = 0
 
@@ -30,7 +30,7 @@ def parser_1(path_to_file, data: dict):
     with open(path_to_file) as f:
         for line in f:
             read_line = line.split()
-            word = read_line[0].strip()
+            word = read_line[0].strip().lower()
             frequency = read_line[1].strip()
             if word in data:
                 data[word] += int(frequency)

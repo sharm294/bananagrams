@@ -111,12 +111,41 @@ bool frequencyPass(Node* node, std::pair<float, float> frequency_range) {
            frequency <= frequency_range.second;
 }
 
+bool lengthPass(Node* node, std::pair<int, int> length_range) {
+    auto len = static_cast<int>(node->getWord().length());
+
+    auto min = length_range.first;
+    auto max = length_range.second;
+
+    // if undefined, return true
+    if (min == 0 && max == 0) {
+        return true;
+    }
+
+    // if there's no min constraint, just check max
+    if (min == -1 && max > 0) {
+        return len <= max;
+    }
+
+    // if there's no max constraint, just check min
+    if (max == -1) {
+        return len >= min;
+    }
+
+    // otherwise, check the range
+    return len >= length_range.first && len <= length_range.second;
+}
+
 bool checkValid(Node* node, const DictionaryFindOptions& options) {
     if (!oneOfPass(node, options.one_of)) {
         return false;
     }
 
     if (!frequencyPass(node, options.frequency_range)) {
+        return false;
+    }
+
+    if (!lengthPass(node, options.length_range)) {
         return false;
     }
 

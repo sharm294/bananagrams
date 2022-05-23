@@ -38,6 +38,7 @@ struct DictionaryFindOptions {
 
     std::vector<std::string> one_of;
     std::pair<float, float> frequency_range = {0, 0};
+    std::pair<int, int> length_range = {0, 0};
 };
 
 class Dictionary {

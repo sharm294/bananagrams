@@ -10,6 +10,7 @@
 int main() {
     bananas::DictionaryFindOptions options;
     options.frequency_range = {99, 100};
+    options.length_range = {3, -1};
     options.dictionary_file = bananas::resolvePath("dictionaries/en_1.txt");
     bananas::Dictionary dict{options};
 
