@@ -113,12 +113,12 @@ bool checkInRange(T value, T min, T max) {
     }
 
     // if there's no min constraint, just check max
-    if (min == -1 && max > 0) {
+    if (min <= 0 && max > 0) {
         return value <= max;
     }
 
     // if there's no max constraint, just check min
-    if (max == -1) {
+    if (max <= 0) {
         return value >= min;
     }
 
