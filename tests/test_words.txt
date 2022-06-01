@@ -1,12 +1,12 @@
-bar
-bard
-bare
-bat
-cat
-car
-bass
-bast
-basil
-cast
-caste
-caster
+bar 40
+bard 39.9
+bare 99
+bat 56.6
+cat 12.5
+car 67
+bass 75
+bast 54
+basil 68
+cast 100
+caste 2.8
+caster 48

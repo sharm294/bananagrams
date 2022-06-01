@@ -105,18 +105,8 @@ bool oneOfPass(Node* node, const std::vector<std::string>& one_of) {
     return false;
 }
 
-bool frequencyPass(Node* node, std::pair<float, float> frequency_range) {
-    auto frequency = node->getFrequency();
-    return frequency >= frequency_range.first &&
-           frequency <= frequency_range.second;
-}
-
-bool lengthPass(Node* node, std::pair<int, int> length_range) {
-    auto len = static_cast<int>(node->getWord().length());
-
-    auto min = length_range.first;
-    auto max = length_range.second;
-
+template <typename T>
+bool checkInRange(T value, T min, T max) {
     // if undefined, return true
     if (min == 0 && max == 0) {
         return true;
@@ -124,16 +114,29 @@ bool lengthPass(Node* node, std::pair<int, int> length_range) {
 
     // if there's no min constraint, just check max
     if (min == -1 && max > 0) {
-        return len <= max;
+        return value <= max;
     }
 
     // if there's no max constraint, just check min
     if (max == -1) {
-        return len >= min;
+        return value >= min;
     }
 
     // otherwise, check the range
-    return len >= length_range.first && len <= length_range.second;
+    return value >= min && value <= max;
+}
+
+bool frequencyPass(Node* node, std::pair<float, float> frequency_range) {
+    auto frequency = node->getFrequency();
+
+    return checkInRange<float>(frequency, frequency_range.first,
+                               frequency_range.second);
+}
+
+bool lengthPass(Node* node, std::pair<int, int> length_range) {
+    auto len = static_cast<int>(node->getWord().length());
+
+    return checkInRange<int>(len, length_range.first, length_range.second);
 }
 
 bool checkValid(Node* node, const DictionaryFindOptions& options) {

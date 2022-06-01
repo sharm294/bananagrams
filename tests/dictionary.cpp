@@ -1,5 +1,6 @@
 #include "bananagrams/dictionary.hpp"
 
+#include <algorithm>
 #include <iostream>
 
 #include "bananagrams/charmap.hpp"
@@ -25,6 +26,8 @@ SCENARIO("Finding all anagrams") {
               "bard",
               "bar",
             };
+            std::sort(words.begin(), words.end());
+            std::sort(golden.begin(), golden.end());
             REQUIRE(words == golden);
         }
 
@@ -33,6 +36,8 @@ SCENARIO("Finding all anagrams") {
             auto words = dict.findWords(chars, options);
             StringVector golden = {"caste", "cast", "bast",
                                    "bass",  "cat",  "bat"};
+            std::sort(words.begin(), words.end());
+            std::sort(golden.begin(), golden.end());
             REQUIRE(words == golden);
         }
     }
@@ -76,6 +81,49 @@ SCENARIO("One of pass") {
             options.one_of.emplace_back("s");
             auto words = dict.findWords(chars, options);
             StringVector golden = {"caste", "cast", "bast", "bass", "cat"};
+            std::sort(words.begin(), words.end());
+            std::sort(golden.begin(), golden.end());
+            REQUIRE(words == golden);
+        }
+    }
+}
+
+SCENARIO("Length pass") {
+    GIVEN("A list of words") {
+        bananas::DictionaryFindOptions options;
+        options.dictionary_file = bananas::resolvePath("tests/test_words.txt");
+        Dictionary dict(options);
+
+        WHEN("Must be more than or equal to four characters") {
+            CharMap chars("abder");
+            DictionaryFindOptions options;
+            options.length_range = {4, -1};
+            auto words = dict.findWords(chars, options);
+            StringVector golden = {"bare", "bard"};
+            std::sort(words.begin(), words.end());
+            std::sort(golden.begin(), golden.end());
+            REQUIRE(words == golden);
+        }
+
+        WHEN("Must be less than four characters") {
+            CharMap chars("basstec");
+            DictionaryFindOptions options;
+            options.length_range = {-1, 3};
+            auto words = dict.findWords(chars, options);
+            StringVector golden = {"cat", "bat"};
+            std::sort(words.begin(), words.end());
+            std::sort(golden.begin(), golden.end());
+            REQUIRE(words == golden);
+        }
+
+        WHEN("Must be between 4 and 5 characters") {
+            CharMap chars("casterbai");
+            DictionaryFindOptions options;
+            options.length_range = {4, 5};
+            auto words = dict.findWords(chars, options);
+            StringVector golden = {"cast", "caste", "bast", "bare"};
+            std::sort(words.begin(), words.end());
+            std::sort(golden.begin(), golden.end());
             REQUIRE(words == golden);
         }
     }

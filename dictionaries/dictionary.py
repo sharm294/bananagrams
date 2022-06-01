@@ -52,18 +52,17 @@ def combine(words: dict, freqs: dict, out_file: str):
         words = {k: 0 for k in freqs.keys()}
         filtered_freqs = freqs
 
+    # sort the frequencies in descending order
     frequency_len = len(filtered_freqs)
-    print(frequency_len)
     sorted_freqs = dict(
         sorted(filtered_freqs.items(), key=lambda item: item[1], reverse=True)
     )
-    index = 0
-    for key in sorted_freqs.keys():
-        sorted_freqs[key] = 100 - (index / frequency_len * 100)
-        index += 1
-        if index < 5:
-            print(key, sorted_freqs[key])
 
+    # convert each frequency to a percentage
+    for index, key in enumerate(sorted_freqs.keys()):
+        sorted_freqs[key] = 100 - (index / frequency_len * 100)
+
+    # write out the words and update frequency information if it exists
     with open(out_file, "w") as f:
         for word, freq in words.items():
             if word in sorted_freqs:
