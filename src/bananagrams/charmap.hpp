@@ -15,6 +15,11 @@ class CharMap {
     int& at(char c) &;
     int at(char c) const&&;
 
+    std::unordered_map<char, int>::iterator begin();
+    std::unordered_map<char, int>::iterator end();
+    std::unordered_map<char, int>::const_iterator cbegin() const;
+    std::unordered_map<char, int>::const_iterator cend() const;
+
     CharMap& operator+=(const char& rhs) {
         if (map_.find(rhs) != map_.end()) {
             map_.at(rhs) += 1;

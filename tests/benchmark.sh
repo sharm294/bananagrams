@@ -19,7 +19,7 @@ compile(){
 # https://stackoverflow.com/a/54920339
 avg_time() {
     n=$1; shift
-    filename=board_${2}.out; shift
+    filename=board_${1}.out; shift
     (($# > 0)) || return                   # bail if no command given
     for ((i = 0; i < n; i++)); do
         # ignore the output of the command but collect time's output in stdout

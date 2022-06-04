@@ -162,10 +162,11 @@ void search(Node* root, CharMap* map, const DictionaryFindOptions& options,
             found_words->emplace_back(root->getWord());
         }
     }
-    for (const auto& [c, next] : *root) {
-        if (map->has(c) && map->at(c) > 0) {
+    for (const auto& [c, count] : *map) {
+        auto* next = root->next(c);
+        if (count > 0 && next != nullptr) {
             map->at(c)--;
-            search(next.get(), map, options, found_words);
+            search(next, map, options, found_words);
             map->at(c)++;
         }
     }
