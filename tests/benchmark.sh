@@ -19,7 +19,7 @@ compile(){
 # https://stackoverflow.com/a/54920339
 avg_time() {
     n=$1; shift
-    filename=board_${1}.out; shift
+    filename="./tests/board_${1}.out"; shift
     (($# > 0)) || return                   # bail if no command given
     for ((i = 0; i < n; i++)); do
         # ignore the output of the command but collect time's output in stdout
@@ -67,16 +67,16 @@ for program in "${programs[@]}"; do
     echo "  Runtimes:" >> $data_file
     avg_time 1 $index $program >> $data_file
 
-    # # memory usage
-    # echo "  Getting memory usage with massif"
-    # valgrind --tool=massif --pages-as-heap=yes --massif-out-file=massif_${index}.out $program &> /dev/null
-    # peak_mem=$(grep mem_heap_B massif.out | sed -e 's/mem_heap_B=\(.*\)/\1/' | sort -g | tail -n 1)
-    # echo "  Peak memory: $peak_mem" >> $data_file
+    # memory usage
+    echo "  Getting memory usage with massif"
+    valgrind --tool=massif --pages-as-heap=yes --massif-out-file=massif_${index}.out $program &> /dev/null
+    peak_mem=$(grep mem_heap_B massif.out | sed -e 's/mem_heap_B=\(.*\)/\1/' | sort -g | tail -n 1)
+    echo "  Peak memory: $peak_mem" >> $data_file
 
-    # # profiling
-    # echo "  Getting profiling data with callgrind"
-    # valgrind --tool=callgrind --callgrind-out-file=callgrind_${index}.out $program &> /dev/null
-    # # callgrind_annotate --tree=both callgrind_${index}.out > tmp.txt  
+    # profiling
+    echo "  Getting profiling data with callgrind"
+    valgrind --tool=callgrind --callgrind-out-file=callgrind_${index}.out $program &> /dev/null
+    # callgrind_annotate --tree=both callgrind_${index}.out > tmp.txt  
 
     index=$((index+1))
 done

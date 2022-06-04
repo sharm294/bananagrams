@@ -15,6 +15,8 @@ class CharMap {
     int& at(char c) &;
     int at(char c) const&&;
 
+    std::string str() const;
+
     std::unordered_map<char, int>::iterator begin();
     std::unordered_map<char, int>::iterator end();
     std::unordered_map<char, int>::const_iterator cbegin() const;

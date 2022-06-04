@@ -12,6 +12,16 @@ int& CharMap::at(char c) & { return map_.at(c); }
 
 int CharMap::at(char c) const&& { return map_.at(c); }
 
+std::string CharMap::str() const {
+    std::string str;
+    for (const auto& [c, count] : map_) {
+        for (auto i = 0; i < count; i++) {
+            str.push_back(c);
+        }
+    }
+    return str;
+}
+
 std::unordered_map<char, int>::iterator CharMap::begin() {
     return map_.begin();
 }
