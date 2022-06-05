@@ -10,7 +10,7 @@
 
 namespace bananas {
 
-Board::Board(const Dictionary *dict) : dict_(dict) {}
+Board::Board(Dictionary *dict) : dict_(dict) {}
 
 char *Board::at(Point p) {
     if (!this->has(p)) {

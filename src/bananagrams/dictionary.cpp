@@ -82,29 +82,6 @@ void Dictionary::print(const DictionaryPrintOptions& options) const {
     }
 }
 
-/**
- * @brief Check if the word contains at least one of the substrings
- *
- * @param word
- * @param one_of vector of strings to check
- * @return true if found at least one
- */
-bool oneOfPass(Node* node, const std::vector<std::string>& one_of) {
-    // if we have no conditions, we always pass
-    if (one_of.empty()) {
-        return true;
-    }
-
-    // otherwise, we check if we have at least one match
-    const auto& word = node->getWord();
-    for (const auto& str : one_of) {
-        if (word.find(str) != word.npos) {
-            return true;
-        }
-    }
-    return false;
-}
-
 template <typename T>
 bool checkInRange(T value, T min, T max) {
     // if undefined, return true
@@ -140,10 +117,6 @@ bool lengthPass(Node* node, std::pair<int, int> length_range) {
 }
 
 bool checkValid(Node* node, const DictionaryFindOptions& options) {
-    if (!oneOfPass(node, options.one_of)) {
-        return false;
-    }
-
     if (!frequencyPass(node, options.frequency_range)) {
         return false;
     }
@@ -180,16 +153,35 @@ bool sortWords(const std::string& lhs, const std::string& rhs) {
 }
 
 StringVector Dictionary::findWords(CharMap characters,
-                                   const DictionaryFindOptions& options) const {
+                                   const DictionaryFindOptions& options) {
     StringVector found_words;
+    auto str = characters.str();
+    auto cached = cache_.find(str);
+    if (cached != cache_.end()) {
+        return cached->second;
+    }
     search(dict_.get(), &characters, options, &found_words);
+    cache_.try_emplace(str, found_words);
     return found_words;
 }
 
 void Dictionary::findWords(CharMap characters,
                            const DictionaryFindOptions& options,
-                           StringVector* vector) const {
+                           StringVector* vector) {
+    auto str = characters.str();
+    auto cached = cache_.find(str);
+    if (cached != cache_.end()) {
+        for (const auto& word : cached->second) {
+            vector->emplace_back(word);
+        };
+        return;
+    }
+    auto size = vector->size();
     search(dict_.get(), &characters, options, vector);
+    // cache the newly added words
+    const auto first = vector->begin() + size;
+    const auto last = vector->end();
+    cache_.try_emplace(str, first, last);
 }
 
 bool Dictionary::isWord(const std::string& word) const {

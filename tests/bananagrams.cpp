@@ -18,6 +18,6 @@ int main() {
     std::transform(chars.begin(), chars.end(), chars.begin(),
                    [](unsigned char c) { return std::tolower(c); });
 
-    auto board = bananas::play(dict, options, chars);
+    auto board = bananas::play(options, chars);
     std::cout << board << std::endl;
 }

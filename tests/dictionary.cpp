@@ -59,35 +59,6 @@ SCENARIO("Checking if it's a word") {
     }
 }
 
-SCENARIO("One of pass") {
-    GIVEN("A list of words") {
-        bananas::DictionaryFindOptions options;
-        options.dictionary_file = bananas::resolvePath("tests/test_words.txt");
-        Dictionary dict(options);
-
-        WHEN("Search string is 'abder' and must contain 'e'") {
-            CharMap chars("abder");
-            DictionaryFindOptions options;
-            options.one_of.emplace_back("e");
-            auto words = dict.findWords(chars, options);
-            StringVector golden = {"bare"};
-            REQUIRE(words == golden);
-        }
-
-        WHEN("Search string is 'basstec' and must contain 'c' or 's'") {
-            CharMap chars("basstec");
-            DictionaryFindOptions options;
-            options.one_of.emplace_back("c");
-            options.one_of.emplace_back("s");
-            auto words = dict.findWords(chars, options);
-            StringVector golden = {"caste", "cast", "bast", "bass", "cat"};
-            std::sort(words.begin(), words.end());
-            std::sort(golden.begin(), golden.end());
-            REQUIRE(words == golden);
-        }
-    }
-}
-
 SCENARIO("Length pass") {
     GIVEN("A list of words") {
         bananas::DictionaryFindOptions options;

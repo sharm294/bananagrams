@@ -11,10 +11,11 @@
 
 namespace bananas {
 
-Board play(const Dictionary& dict, const DictionaryFindOptions& options,
+Board play(const DictionaryFindOptions& options,
            const std::string& characters) {
     CharMap chars(characters);
 
+    Dictionary dict(options);
     Board board(&dict);
 
     // maintain the state (word_index and position_index of each played) so

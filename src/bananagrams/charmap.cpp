@@ -1,5 +1,7 @@
 #include "charmap.hpp"
 
+#include <algorithm>
+
 namespace bananas {
 
 CharMap::CharMap(const std::string& characters) { *this += characters; }
@@ -19,6 +21,8 @@ std::string CharMap::str() const {
             str.push_back(c);
         }
     }
+    // ensure the order is deterministic
+    std::sort(str.begin(), str.end());
     return str;
 }
 

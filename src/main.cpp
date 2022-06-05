@@ -53,13 +53,12 @@ int main(int argc, char* argv[]) {
     banana_options.frequency_range = {freq_min, freq_max};
     banana_options.length_range = {len_min, len_max};
     banana_options.dictionary_file = positionals[0];
-    bananas::Dictionary dict{banana_options};
 
     auto& chars = positionals[1];
     std::transform(chars.begin(), chars.end(), chars.begin(),
                    [](unsigned char c) { return std::tolower(c); });
 
-    auto board = bananas::play(dict, banana_options, chars);
+    auto board = bananas::play(banana_options, chars);
     std::cout << board << std::endl;
 
     return 0;

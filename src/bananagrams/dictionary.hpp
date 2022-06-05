@@ -36,7 +36,6 @@ struct DictionaryFindOptions {
     // global options
     std::string dictionary_file;
 
-    std::vector<std::string> one_of;
     std::pair<float, float> frequency_range = {0, 0};
     std::pair<int, int> length_range = {0, 0};
 };
@@ -47,9 +46,9 @@ class Dictionary {
 
     bool isWord(const std::string& word) const;
     StringVector findWords(CharMap characters,
-                           const DictionaryFindOptions& options) const;
+                           const DictionaryFindOptions& options);
     void findWords(CharMap characters, const DictionaryFindOptions& options,
-                   StringVector* set) const;
+                   StringVector* set);
 
     void print(
       const DictionaryPrintOptions& options = DictionaryPrintOptions()) const;
@@ -57,6 +56,7 @@ class Dictionary {
    private:
     DictionaryFindOptions options_;
     std::unique_ptr<Node> dict_;
+    std::unordered_map<std::string, StringVector> cache_;
 };
 
 }  // namespace bananas
