@@ -65,7 +65,7 @@ for program in "${programs[@]}"; do
     echo "  Getting program runtime"
     # run_time=$(/usr/bin/time --format "%E" $program)
     echo "  Runtimes:" >> $data_file
-    avg_time 1 $index $program >> $data_file
+    avg_time 3 $index $program >> $data_file
 
     # memory usage
     echo "  Getting memory usage with massif"

@@ -152,7 +152,7 @@ bool sortWords(const std::string& lhs, const std::string& rhs) {
     return lhs > rhs;
 }
 
-StringVector Dictionary::findWords(CharMap characters,
+StringVector Dictionary::findWords(CharMap& characters,
                                    const DictionaryFindOptions& options) {
     StringVector found_words;
     auto str = characters.str();
@@ -165,7 +165,7 @@ StringVector Dictionary::findWords(CharMap characters,
     return found_words;
 }
 
-void Dictionary::findWords(CharMap characters,
+void Dictionary::findWords(CharMap& characters,
                            const DictionaryFindOptions& options,
                            StringVector* vector) {
     auto str = characters.str();

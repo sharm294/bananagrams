@@ -45,9 +45,9 @@ class Dictionary {
     explicit Dictionary(DictionaryFindOptions options);
 
     bool isWord(const std::string& word) const;
-    StringVector findWords(CharMap characters,
+    StringVector findWords(CharMap& characters,
                            const DictionaryFindOptions& options);
-    void findWords(CharMap characters, const DictionaryFindOptions& options,
+    void findWords(CharMap& characters, const DictionaryFindOptions& options,
                    StringVector* set);
 
     void print(
