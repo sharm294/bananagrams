@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <sstream>
 
 #include "charmap.hpp"
 #include "dictionary.hpp"
@@ -285,6 +286,15 @@ void Board::insertWord(const std::string &word, Point start,
         }
         updatePoint(curr_point, direction);
     }
+}
+
+std::string Board::serialize() const {
+    std::stringstream board;
+
+    for (const auto &[point, c] : board_) {
+        board << point << ":" << c << ";";
+    }
+    return board.str();
 }
 
 std::ostream &operator<<(std::ostream &os, const Board &self) {
