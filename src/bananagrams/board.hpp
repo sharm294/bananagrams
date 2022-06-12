@@ -29,6 +29,7 @@ class Board {
                             size_t word_offset, size_t position_offset);
     std::string removeLastWord();
     std::string serialize() const;
+    void clear();
 
     char *at(Point p);
     bool has(Point p);

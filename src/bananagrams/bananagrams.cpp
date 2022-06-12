@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cassert>
+#include <chrono>
 #include <iostream>
 #include <stack>
 #include <string>
@@ -11,12 +12,15 @@
 
 namespace bananas {
 
-Board play(const DictionaryFindOptions& options,
-           const std::string& characters) {
+Board play(const DictionaryFindOptions& options, const std::string& characters,
+           int64_t time_limit) {
     CharMap chars(characters);
 
     Dictionary dict(options);
     Board board(&dict);
+
+    auto now = std::chrono::system_clock::now();
+    bool timed_out = false;
 
     // maintain the state (word_index and position_index of each played) so
     // we can keep track on backtracking
@@ -38,6 +42,7 @@ Board play(const DictionaryFindOptions& options,
                 // no valid solution given the characters and constraints
                 if (state.size() == 1) {
                     std::cout << "Could not find solution" << std::endl;
+                    board.clear();
                     return board;
                 }
                 chars += board.removeLastWord();
@@ -51,8 +56,24 @@ Board play(const DictionaryFindOptions& options,
             default:
                 assert(false);
         }
-    } while (!chars.empty());
+        if (time_limit != 0) {
+            auto end = std::chrono::system_clock::now();
+            std::chrono::duration<double> elapsed_seconds = end - now;
+            timed_out = elapsed_seconds.count() > time_limit;
+        }
+    } while ((!chars.empty()) && (!timed_out));
+
+    if (timed_out) {
+        std::cout << "No solution found in time limit\n";
+        board.clear();
+    }
+
     return board;
+}
+
+Board play(const DictionaryFindOptions& options,
+           const std::string& characters) {
+    return play(options, characters, 0);
 }
 
 }  // namespace bananas

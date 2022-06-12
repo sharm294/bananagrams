@@ -198,6 +198,8 @@ bool Board::tryHorizontal(Point connection_point, const std::string &word,
     return false;
 }
 
+void Board::clear() { board_.clear(); }
+
 std::string Board::getLastWord() {
     auto &last = history_.top();
     std::string chars;

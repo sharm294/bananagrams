@@ -17,6 +17,7 @@ int main(int argc, char* argv[]) {
     float freq_max = 0;
     int len_min = 0;
     int len_max = 0;
+    int64_t time_limit = 0;
     // clang-format off
     options.add_options()
       ("positionals", "", cxxopts::value<std::vector<std::string>>(positionals))
@@ -26,6 +27,8 @@ int main(int argc, char* argv[]) {
         cxxopts::value<float>(freq_max))
       ("len-min", "Minimum word length", cxxopts::value<int>(len_min))
       ("len-max", "Maximum word length", cxxopts::value<int>(len_max))
+      ("time-limit", "Max time to search in seconds",
+        cxxopts::value<int64_t>(time_limit))
       ("h,help", "Print usage");
     // clang-format on
 
@@ -39,16 +42,6 @@ int main(int argc, char* argv[]) {
         exit(0);
     }
 
-    // std::cout << "Characters:\n";
-    // for (const auto& foo : positionals) {
-    //     std::cout << foo << std::endl;
-    // }
-
-    // std::cout << "Dictionary:\n";
-    // for (const auto& foo : dictionary) {
-    //     std::cout << foo << std::endl;
-    // }
-
     bananas::DictionaryFindOptions banana_options;
     banana_options.frequency_range = {freq_min, freq_max};
     banana_options.length_range = {len_min, len_max};
@@ -58,7 +51,7 @@ int main(int argc, char* argv[]) {
     std::transform(chars.begin(), chars.end(), chars.begin(),
                    [](unsigned char c) { return std::tolower(c); });
 
-    auto board = bananas::play(banana_options, chars);
+    auto board = bananas::play(banana_options, chars, time_limit);
     std::cout << board << std::endl;
 
     return 0;
