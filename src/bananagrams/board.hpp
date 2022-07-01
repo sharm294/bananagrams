@@ -6,7 +6,7 @@
 #include <stack>
 #include <unordered_map>
 
-#include "point.hpp"
+#include "bananagrams/point.hpp"
 
 namespace bananas {
 
@@ -46,6 +46,7 @@ class Board {
     template <bool horizontal>
     bool tryHorizontal(Point connection_point, const std::string &word,
                        size_t offset);
+    std::pair<Point, Point> getDimensions() const;
 
     std::unordered_map<Point, char, PointHash> board_;
     Dictionary *dict_;

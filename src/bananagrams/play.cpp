@@ -5,10 +5,11 @@
 #include <stack>
 #include <string>
 
-#include "board.hpp"
-#include "charmap.hpp"
-#include "dictionary.hpp"
-#include "node.hpp"
+#include "bananagrams/bananagrams.hpp"
+#include "bananagrams/board.hpp"
+#include "bananagrams/charmap.hpp"
+#include "bananagrams/dictionary.hpp"
+#include "bananagrams/node.hpp"
 
 namespace bananas {
 

@@ -17,6 +17,11 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-g -O3")
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+# set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+
+option(BUILD_KOTLIN_BINDINGS "Build Kotlin bindings for Android" OFF)
+
+set(PROJECT_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/include)
 
 add_subdirectory(src)
 add_subdirectory(tests)

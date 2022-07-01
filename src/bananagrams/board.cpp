@@ -4,10 +4,11 @@
 #include <cassert>
 #include <sstream>
 
-#include "charmap.hpp"
-#include "dictionary.hpp"
-#include "node.hpp"
-#include "point.hpp"
+#include "bananagrams/bananagrams.hpp"
+#include "bananagrams/charmap.hpp"
+#include "bananagrams/dictionary.hpp"
+#include "bananagrams/node.hpp"
+#include "bananagrams/point.hpp"
 
 namespace bananas {
 
@@ -290,20 +291,11 @@ void Board::insertWord(const std::string &word, Point start,
     }
 }
 
-std::string Board::serialize() const {
-    std::stringstream board;
-
-    for (const auto &[point, c] : board_) {
-        board << point << ":" << c << ";";
-    }
-    return board.str();
-}
-
-std::ostream &operator<<(std::ostream &os, const Board &self) {
+std::pair<Point, Point> Board::getDimensions() const {
     // get board dimensions
     Point top_left = {0, 0};
     Point bottom_right = {0, 0};
-    for (const auto &[point, c] : self.board_) {
+    for (const auto &[point, c] : board_) {
         if (point.x < top_left.x) {
             top_left.x = point.x;
         }
@@ -317,20 +309,35 @@ std::ostream &operator<<(std::ostream &os, const Board &self) {
             bottom_right.y = point.y;
         }
     }
+    return {top_left, bottom_right};
+}
 
-    // print board
+std::string Board::serialize() const {
+    auto [top_left, bottom_right] = getDimensions();
+    auto x_dim = bottom_right.x - top_left.x;
+    auto y_dim = bottom_right.y - top_left.y;
+    // +1 for adding a \n char to each row
+    auto tile_count = (x_dim + 1) * y_dim;
+
+    std::string board;
+    board.reserve(tile_count);
+
     for (auto y = top_left.y; y <= bottom_right.y; ++y) {
         for (auto x = top_left.x; x <= bottom_right.x; ++x) {
-            const auto point = self.board_.find({x, y});
-            if (point == self.board_.end()) {
-                os << " ";
+            const auto point = board_.find({x, y});
+            if (point == board_.end()) {
+                board.push_back(' ');
             } else {
-                os << point->second;
+                board.push_back(point->second);
             }
-            os << " ";
         }
-        os << "\n";
+        board.push_back('\n');
     }
+    return board;
+}
+
+std::ostream &operator<<(std::ostream &os, const Board &self) {
+    os << self.serialize();
 
     return os;
 }

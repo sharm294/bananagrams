@@ -6,7 +6,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "node.hpp"
+#include "bananagrams/bananagrams.hpp"
+#include "bananagrams/node.hpp"
 
 namespace bananas {
 
@@ -30,14 +31,6 @@ struct DictionaryPrintOptions {
 
     // kTree options
     int depth = -1;
-};
-
-struct DictionaryFindOptions {
-    // global options
-    std::string dictionary_file;
-
-    std::pair<float, float> frequency_range = {0, 0};
-    std::pair<int, int> length_range = {0, 0};
 };
 
 class Dictionary {

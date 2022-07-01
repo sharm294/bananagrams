@@ -1,4 +1,4 @@
-#include "node.hpp"
+#include "bananagrams/node.hpp"
 
 #include <memory>
 

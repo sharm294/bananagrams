@@ -1,4 +1,4 @@
-#include "charmap.hpp"
+#include "bananagrams/charmap.hpp"
 
 #include <algorithm>
 

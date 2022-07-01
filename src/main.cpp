@@ -5,9 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "bananagrams/board.hpp"
-#include "bananagrams/dictionary.hpp"
-#include "bananagrams/play.hpp"
+#include "bananagrams/bananagrams.hpp"
 
 int main(int argc, char* argv[]) {
     cxxopts::Options options("Bananagrams", "Bananagram solver");
@@ -51,7 +49,7 @@ int main(int argc, char* argv[]) {
     std::transform(chars.begin(), chars.end(), chars.begin(),
                    [](unsigned char c) { return std::tolower(c); });
 
-    auto board = bananas::play(banana_options, chars, time_limit);
+    auto board = bananas::cpp_play(banana_options, chars, time_limit);
     std::cout << board << std::endl;
 
     return 0;

@@ -1,4 +1,4 @@
-#include "dictionary.hpp"
+#include "bananagrams/dictionary.hpp"
 
 #include <algorithm>
 #include <fstream>
@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "charmap.hpp"
+#include "bananagrams/charmap.hpp"
 
 namespace bananas {
 
