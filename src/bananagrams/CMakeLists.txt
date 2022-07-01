@@ -1,9 +1,9 @@
 list(APPEND files
-    bananagrams
     board
     charmap
     dictionary
     node
+    play
 )
 
 list(APPEND object_files)
@@ -13,8 +13,5 @@ foreach(file ${files})
     list(APPEND object_files $<TARGET_OBJECTS:${file}>)
 endforeach()
 
-add_library(libbananagrams INTERFACE)
-target_link_libraries(libbananagrams INTERFACE
-    ${files}
-    ${object_files}
-)
+add_library(bananagrams SHARED ${object_files})
+target_link_libraries(bananagrams PRIVATE ${files})

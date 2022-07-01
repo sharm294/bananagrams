@@ -5,9 +5,9 @@
 #include <string>
 #include <vector>
 
-#include "bananagrams/bananagrams.hpp"
 #include "bananagrams/board.hpp"
 #include "bananagrams/dictionary.hpp"
+#include "bananagrams/play.hpp"
 
 int main(int argc, char* argv[]) {
     cxxopts::Options options("Bananagrams", "Bananagram solver");

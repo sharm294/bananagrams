@@ -1,10 +1,9 @@
-#include "bananagrams/bananagrams.hpp"
-
 #include <algorithm>
 #include <iostream>
 
 #include "bananagrams/board.hpp"
 #include "bananagrams/dictionary.hpp"
+#include "bananagrams/play.hpp"
 #include "helpers.hpp"
 
 int main() {
