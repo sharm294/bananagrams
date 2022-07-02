@@ -1,23 +1,24 @@
 #ifndef GUARD_BANANAGRAMS_H
 #define GUARD_BANANAGRAMS_H
 
-struct DictionaryFindOptions {
+struct DictionaryFindOptions_s {
     char* dictionary_file;
     unsigned int dictionary_file_len;
 
-    float freq_min = 0;
-    float freq_max = 0;
-    int len_min = 0;
-    int len_max = 0;
+    float freq_min;
+    float freq_max;
+    int len_min;
+    int len_max;
 };
-typedef struct DictionaryFindOptions DictionaryFindOptions;
+typedef struct DictionaryFindOptions_s DictionaryFindOptions;
+extern const DictionaryFindOptions DictionaryFindOptions_default;
 
 #ifdef __cplusplus
 extern "C" {
 #endif  // __cplusplus
 
 extern char* c_play(DictionaryFindOptions* options, char* chars,
-                    unsigned int char_num, int time_constraint, int& num_tiles);
+                    unsigned int char_num, int time_constraint, int* num_tiles);
 
 #ifdef __cplusplus
 }
